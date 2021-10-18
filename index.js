@@ -3824,7 +3824,16 @@ Mib.prototype.getTreeNode = function (oid) {
 		var last = address.pop ();
 		var parent = this.lookupAddress (address);
 		if ( parent ) {
-			return (parent.findChildImmediatelyBefore (last) || parent);
+			node = parent.findChildImmediatelyBefore (last);
+			if (!node)
+				return parent;
+			while (true) {
+				// Find the last descendant
+				var childrenAddresses = Object.keys (node.children).sort ( (a, b) => a - b);
+				if (childrenAddresses.length == 0)
+					return node;
+				node = node.children[childrenAddresses[childrenAddresses.length - 1]];
+			}
 		}
 	}
 	return this.root;
